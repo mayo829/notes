@@ -6,20 +6,29 @@
       "parentId": null
     },
     {
-      "id": "folder-reference",
-      "name": "Reference",
+      "id": "598761ca-793b-43f0-a19e-a36c2370ab61",
+      "name": "Entrepreneurship",
       "parentId": null
     }
   ],
   "notes": [
     {
+      "id": "a38543de-0a6c-4e65-96e0-5cdb0b46edce",
+      "title": "Sales and business 101",
+      "folderId": "598761ca-793b-43f0-a19e-a36c2370ab61",
+      "content": "# [Sales 101]{https://www.youtube.com/watch?v=uWdIgftpvBI}\n\n- offer a premium subscription for 10-100x the price of lower price, and lower priced option but with 80-90% of the features\n- **IF YOU CAN ARTICULATE SOMEONES PROBLEM BETTER THAN THEY CAN, THEY WILL INHERENTLY BELIEVE THAT YOU CAN SOLVE IT**",
+      "tags": [],
+      "createdAt": "2026-03-12T03:28:35.932Z",
+      "updatedAt": "2026-03-12T03:34:27.774Z"
+    },
+    {
       "id": "28fdfca2-9fc7-496b-805a-1258eecb3461",
       "title": "2026 Social Media Content Creation",
-      "folderId": null,
+      "folderId": "598761ca-793b-43f0-a19e-a36c2370ab61",
       "content": "# 2026 Social Media Content Creation\n\n- SPCL\n   - Status: control or have access to a scarce resource that other people want. Ex) having lots of money means you have a resource being money that everyone wants\n   - Power: saying something that when someone complies, leads to something positive. Ex) someone says to buy 10 stocks, and you do and you make lots of moeny\n   - Credibility: proof of acomplishment\n   - Likeliness/relatability: how relatable you are to someone else and how alike are you. Ex) vibe with each other, personalities match, same gender, same similar values (want to get rich).\n\n- Social media is moving towards interests and what people find most interesting (all social media algorithms to maximize watch time and time spent on app)\n\n- strategy for 2026 is to make 10 pieces of content per day. Either livestream (best) or make a long video (second best), then make shorts from the longer video to draw people to watch the livestream/long video on youtube.\n- make interesting videos and will keep watching",
       "tags": [],
       "createdAt": "2026-03-12T02:54:12.167Z",
-      "updatedAt": "2026-03-12T03:07:39.546Z"
+      "updatedAt": "2026-03-12T03:14:29.110Z"
     },
     {
       "id": "welcome",
@@ -35,14 +44,14 @@
     {
       "id": "markdown-guide",
       "title": "Markdown Guide",
-      "folderId": "folder-reference",
+      "folderId": "folder-meta",
       "content": "# Markdown Guide\n\nA quick reference for Markdown syntax supported in Notes.\n\n## Text Formatting\n\n**Bold**, *italic*, ~~strikethrough~~, `inline code`\n\n## Headings\n\nUse `#` through `######` for headings.\n\n## Lists\n\n- Unordered item\n- Another item\n  - Nested item\n\n1. Ordered item\n2. Second item\n\n## Links\n\n- External: [OpenAI](https://openai.com)\n- Wiki link to another note: [[Welcome to Notes]]\n\n## Code Blocks\n\n```js\nconst greet = (name) => `Hello, ${name}!`\nconsole.log(greet('world'))\n```\n\n## Blockquotes\n\n> This is a blockquote.\n\n## Tables\n\n| Column A | Column B |\n|----------|----------|\n| Cell 1   | Cell 2   |\n| Cell 3   | Cell 4   |\n\n## Horizontal Rule\n\n---\n\nBack to [[Welcome to Notes]].\n",
       "tags": [
         "reference",
         "meta"
       ],
       "createdAt": "2026-01-02T00:00:00.000Z",
-      "updatedAt": "2026-01-02T00:00:00.000Z"
+      "updatedAt": "2026-03-12T03:13:38.206Z"
     }
   ]
 }
