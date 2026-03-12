@@ -1,0 +1,180 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-zinc-800;
+  }
+  body {
+    @apply bg-surface-950 text-zinc-200 antialiased;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-zinc-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-zinc-600;
+  }
+}
+
+@layer utilities {
+  .note-link {
+    @apply text-violet-400 underline decoration-violet-400/40 underline-offset-2
+           hover:decoration-violet-400 transition-all cursor-pointer;
+  }
+}
+
+/* ── Note prose ─────────────────────────────────────────────────── */
+@layer components {
+
+  .note-prose {
+    @apply text-zinc-300 leading-relaxed text-[15px];
+  }
+
+  /* Headings */
+  .note-prose h1 {
+    @apply text-2xl font-semibold text-zinc-100 mt-0 mb-5
+           pb-3 border-b border-zinc-800;
+  }
+  .note-prose h2 {
+    @apply text-lg font-semibold text-zinc-100 mt-8 mb-3
+           flex items-center gap-2;
+  }
+  .note-prose h2::before {
+    content: '';
+    @apply block w-1 h-5 rounded-full bg-violet-500 shrink-0;
+  }
+  .note-prose h3 {
+    @apply text-base font-semibold text-zinc-200 mt-6 mb-2;
+  }
+  .note-prose h4 {
+    @apply text-sm font-semibold text-zinc-300 mt-4 mb-1 uppercase tracking-wider;
+  }
+  .note-prose h5,
+  .note-prose h6 {
+    @apply text-sm font-medium text-zinc-400 mt-3 mb-1;
+  }
+
+  /* Paragraphs */
+  .note-prose p {
+    @apply mb-4 text-zinc-300 leading-7;
+  }
+
+  /* Bold / italic / strike */
+  .note-prose strong {
+    @apply font-semibold text-zinc-100;
+  }
+  .note-prose em {
+    @apply italic text-zinc-300;
+  }
+  .note-prose del {
+    @apply line-through text-zinc-600;
+  }
+
+  /* Inline code */
+  .note-prose :not(pre) > code {
+    @apply font-mono text-[13px] text-violet-300
+           bg-violet-950/40 border border-violet-800/30
+           px-1.5 py-0.5 rounded;
+  }
+
+  /* Horizontal rule */
+  .note-prose hr {
+    @apply my-8 border-0 h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent;
+  }
+
+  /* Unordered lists */
+  .note-prose ul {
+    @apply mb-4 space-y-1.5 pl-0 list-none;
+  }
+  .note-prose ul > li {
+    @apply flex items-start gap-2.5 text-zinc-300;
+  }
+  .note-prose ul > li::before {
+    content: '';
+    @apply block w-1.5 h-1.5 rounded-full bg-violet-500/70 shrink-0 mt-[9px];
+  }
+
+  /* Ordered lists */
+  .note-prose ol {
+    @apply mb-4 space-y-1.5 pl-0 list-none;
+    counter-reset: ol-counter;
+  }
+  .note-prose ol > li {
+    @apply flex items-start gap-2.5 text-zinc-300;
+    counter-increment: ol-counter;
+  }
+  .note-prose ol > li::before {
+    content: counter(ol-counter);
+    @apply flex items-center justify-center w-5 h-5 rounded text-[11px]
+           font-semibold font-mono text-violet-400 bg-violet-950/50
+           border border-violet-800/40 shrink-0 mt-0.5;
+  }
+
+  /* Nested lists */
+  .note-prose li > ul,
+  .note-prose li > ol {
+    @apply mt-1.5 ml-5;
+  }
+  .note-prose li > ul > li::before {
+    @apply bg-zinc-600 w-1 h-1 mt-[11px];
+  }
+
+  /* Blockquotes */
+  .note-prose blockquote {
+    @apply relative my-5 pl-4 pr-4 py-3
+           bg-amber-950/20 border-l-2 border-amber-500/60
+           rounded-r-lg text-amber-200/80 not-italic;
+  }
+  .note-prose blockquote p {
+    @apply mb-0 text-amber-200/80;
+  }
+  .note-prose blockquote::before {
+    content: '"';
+    @apply absolute -top-1 left-3 text-3xl text-amber-500/30 font-serif leading-none;
+  }
+
+  /* External links */
+  .note-prose a {
+    @apply text-sky-400 underline decoration-sky-400/40 underline-offset-2
+           hover:decoration-sky-400 transition-colors;
+  }
+
+  /* Tables */
+  .note-prose table {
+    @apply w-full my-5 text-sm border-collapse;
+  }
+  .note-prose thead {
+    @apply bg-zinc-800/60;
+  }
+  .note-prose thead th {
+    @apply px-3 py-2 text-left text-xs font-semibold text-zinc-300
+           uppercase tracking-wider border-b border-zinc-700;
+  }
+  .note-prose tbody tr {
+    @apply border-b border-zinc-800/60 transition-colors hover:bg-zinc-800/30;
+  }
+  .note-prose tbody tr:last-child {
+    @apply border-b-0;
+  }
+  .note-prose tbody td {
+    @apply px-3 py-2 text-zinc-400;
+  }
+  .note-prose table {
+    @apply rounded-lg overflow-hidden border border-zinc-800;
+  }
+
+  /* Task list checkboxes */
+  .note-prose input[type='checkbox'] {
+    @apply accent-violet-500 mr-1.5;
+  }
+}
