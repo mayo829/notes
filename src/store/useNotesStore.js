@@ -266,6 +266,43 @@ export const useNotesStore = create(
     }),
     {
       name: 'notes-storage',
+      // On every load, merge the bundled notes-data.json into whatever is in
+      // localStorage so that notes saved to the file are never invisible.
+      // localStorage wins on ID conflicts (preserves in-browser edits).
+      merge(persistedState, currentState) {
+        const persisted = persistedState ?? {}
+
+        const seedNoteMap = Object.fromEntries(SEED_DATA.notes.map((n) => [n.id, n]))
+        const lsNoteMap   = Object.fromEntries((persisted.notes ?? []).map((n) => [n.id, n]))
+        // Union: for each note, pick whichever version has the newer updatedAt.
+        // This means a Save to file always wins when it's more recent than localStorage.
+        const allIds = new Set([...Object.keys(seedNoteMap), ...Object.keys(lsNoteMap)])
+        const mergedNotes = [...allIds].map((id) => {
+          const seed = seedNoteMap[id]
+          const ls   = lsNoteMap[id]
+          if (!seed) return ls
+          if (!ls)   return seed
+          return new Date(ls.updatedAt) >= new Date(seed.updatedAt) ? ls : seed
+        })
+
+        const seedFolderMap = Object.fromEntries(SEED_DATA.folders.map((f) => [f.id, f]))
+        const lsFolderMap   = Object.fromEntries((persisted.folders ?? []).map((f) => [f.id, f]))
+        const mergedFolders = Object.values({ ...seedFolderMap, ...lsFolderMap })
+
+        // Sort notes newest-first
+        mergedNotes.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+
+        return {
+          ...currentState,
+          ...persisted,
+          notes: mergedNotes,
+          folders: mergedFolders,
+          expandedFolders: {
+            ...Object.fromEntries(mergedFolders.map((f) => [f.id, true])),
+            ...(persisted.expandedFolders ?? {}),
+          },
+        }
+      },
     }
   )
 )

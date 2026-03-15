@@ -6,6 +6,178 @@ import { indentOnInput, bracketMatching, foldGutter, syntaxHighlighting, default
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete'
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
+import TurndownService from 'turndown'
+
+// ── HTML → Markdown paste handler ───────────────────────────────────
+const td = new TurndownService({
+  headingStyle: 'atx',       // # Heading
+  hr: '---',
+  bulletListMarker: '-',
+  codeBlockStyle: 'fenced',  // ```code```
+  fence: '```',
+  emDelimiter: '*',
+  strongDelimiter: '**',
+  linkStyle: 'inlined',
+})
+
+// Keep <br> as a newline
+td.addRule('lineBreak', {
+  filter: 'br',
+  replacement: () => '\n',
+})
+
+// Preserve strikethrough
+td.addRule('strikethrough', {
+  filter: ['del', 's', 'strike'],
+  replacement: (content) => `~~${content}~~`,
+})
+
+// Unwrap <div> and <span> that only add whitespace noise
+td.addRule('divSpan', {
+  filter: ['div', 'span'],
+  replacement: (content) => content,
+})
+
+function htmlToMarkdown(html) {
+  // Strip MS-Word / Google Docs noise
+  const clean = html
+    .replace(/<!--[\s\S]*?-->/g, '')          // HTML comments
+    .replace(/<style[\s\S]*?<\/style>/gi, '') // inline <style> blocks
+    .replace(/<script[\s\S]*?<\/script>/gi, '') // any scripts
+    .replace(/\s*class="[^"]*"/gi, '')        // class attributes
+    .replace(/\s*style="[^"]*"/gi, '')        // style attributes
+    .replace(/\s*id="[^"]*"/gi, '')           // id attributes
+  return td.turndown(clean).trim()
+}
+
+// ── Image helpers ────────────────────────────────────────────────────
+
+// Whether the dev save-server is reachable (checked once lazily)
+let devServerAvailable = null
+async function checkDevServer() {
+  if (devServerAvailable !== null) return devServerAvailable
+  try {
+    await fetch('/api/save', { method: 'HEAD' })
+    devServerAvailable = true
+  } catch {
+    devServerAvailable = false
+  }
+  return devServerAvailable
+}
+
+function fileToDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => resolve(e.target.result)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+function insertImageMarkdown(view, src, filename = 'image') {
+  const { from, to } = view.state.selection.main
+  const alt = filename.replace(/\.[^.]+$/, '').replace(/[^\w\s-]/g, ' ').trim() || 'image'
+  const insert = `![${alt}](${src})`
+  view.dispatch({
+    changes: { from, to, insert },
+    selection: { anchor: from + insert.length },
+    scrollIntoView: true,
+    userEvent: 'input.paste',
+  })
+}
+
+async function uploadImageFile(file) {
+  const dataUrl = await fileToDataURL(file)
+  const dev = await checkDevServer()
+
+  if (dev) {
+    // Dev: POST to save-server → file written to public/images/, get back a clean path
+    const res = await fetch('/api/upload-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: file.name, data: dataUrl }),
+    })
+    const json = await res.json()
+    if (!json.ok) throw new Error(json.error)
+    // Build path using Vite's BASE_URL so it works both in dev (/) and on GitHub Pages (/notes/)
+    const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+    return `${base}/images/${json.filename}`
+  } else {
+    // Production / no server: fall back to inline base64 data URL
+    return dataUrl
+  }
+}
+
+async function handleImageFiles(files, view) {
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue
+    try {
+      const src = await uploadImageFile(file)
+      insertImageMarkdown(view, src, file.name)
+    } catch (e) {
+      console.error('Image upload failed', e)
+    }
+  }
+}
+
+// Exposed so NoteEditor toolbar button can trigger an upload and insert
+export async function uploadAndInsert(viewRef, file) {
+  const view = viewRef.current
+  if (!view || !file) return
+  try {
+    const src = await uploadImageFile(file)
+    insertImageMarkdown(view, src, file.name)
+  } catch (e) {
+    console.error('Image upload failed', e)
+  }
+}
+
+function makePasteExtension() {
+  return EditorView.domEventHandlers({
+    paste(event, view) {
+      const items = event.clipboardData?.items ?? []
+
+      // Check for image items first
+      const imageItems = [...items].filter((i) => i.type.startsWith('image/'))
+      if (imageItems.length > 0) {
+        event.preventDefault()
+        handleImageFiles(imageItems.map((i) => i.getAsFile()), view)
+        return true
+      }
+
+      // Fall through to HTML → Markdown conversion
+      const html = event.clipboardData?.getData('text/html')
+      if (!html || html.trim() === '') return false
+
+      event.preventDefault()
+      const md = htmlToMarkdown(html)
+      const { from, to } = view.state.selection.main
+      view.dispatch({
+        changes: { from, to, insert: md },
+        selection: { anchor: from + md.length },
+        scrollIntoView: true,
+        userEvent: 'input.paste',
+      })
+      return true
+    },
+
+    drop(event, view) {
+      const files = [...(event.dataTransfer?.files ?? [])].filter((f) =>
+        f.type.startsWith('image/')
+      )
+      if (files.length === 0) return false
+
+      event.preventDefault()
+      // Move cursor to drop position
+      const pos = view.posAtCoords({ x: event.clientX, y: event.clientY })
+      if (pos != null) {
+        view.dispatch({ selection: { anchor: pos }, scrollIntoView: true })
+      }
+      handleImageFiles(files, view)
+      return true
+    },
+  })
+}
 
 // Markdown-aware Enter: continues list items, blockquotes, etc.
 function markdownEnterCommand({ state, dispatch }) {
@@ -228,6 +400,8 @@ export function useCodeMirror({ containerRef, value, onChange }) {
           ...historyKeymap,
           ...searchKeymap,
         ]),
+        // HTML → Markdown paste
+        makePasteExtension(),
         // Theme
         appTheme,
         // Change listener

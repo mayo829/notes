@@ -92,41 +92,50 @@
     @apply my-8 border-0 h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent;
   }
 
+  /* ── Lists ───────────────────────────────────────────────────── */
+
   /* Unordered lists */
   .note-prose ul {
-    @apply mb-4 space-y-1.5 pl-0 list-none;
+    @apply mb-4 pl-5 list-none;
   }
   .note-prose ul > li {
-    @apply flex items-start gap-2.5 text-zinc-300;
+    @apply relative text-zinc-300 mb-1.5 leading-7 pl-4;
   }
   .note-prose ul > li::before {
     content: '';
-    @apply block w-1.5 h-1.5 rounded-full bg-violet-500/70 shrink-0 mt-[9px];
+    @apply absolute left-0 top-[11px] w-1.5 h-1.5 rounded-full bg-violet-500/70;
   }
 
   /* Ordered lists */
   .note-prose ol {
-    @apply mb-4 space-y-1.5 pl-0 list-none;
+    @apply mb-4 pl-5 list-none;
     counter-reset: ol-counter;
   }
   .note-prose ol > li {
-    @apply flex items-start gap-2.5 text-zinc-300;
+    @apply relative text-zinc-300 mb-1.5 leading-7 pl-6;
     counter-increment: ol-counter;
   }
   .note-prose ol > li::before {
-    content: counter(ol-counter);
-    @apply flex items-center justify-center w-5 h-5 rounded text-[11px]
-           font-semibold font-mono text-violet-400 bg-violet-950/50
-           border border-violet-800/40 shrink-0 mt-0.5;
+    content: counter(ol-counter) '.';
+    @apply absolute left-0 top-0 font-mono text-[12px] font-semibold
+           text-violet-400 leading-7 min-w-[20px];
   }
 
-  /* Nested lists */
+  /* Nested lists — indent and change bullet style */
   .note-prose li > ul,
   .note-prose li > ol {
-    @apply mt-1.5 ml-5;
+    @apply mt-1.5 mb-0 pl-4;
   }
   .note-prose li > ul > li::before {
-    @apply bg-zinc-600 w-1 h-1 mt-[11px];
+    @apply w-1 h-1 bg-zinc-500 top-[13px];
+  }
+  .note-prose li > ul > li > ul > li::before {
+    @apply bg-zinc-600 top-[13px];
+  }
+
+  /* Kill the extra margin react-markdown puts on <p> inside <li> */
+  .note-prose li > p {
+    @apply mb-0;
   }
 
   /* Blockquotes */
@@ -176,5 +185,10 @@
   /* Task list checkboxes */
   .note-prose input[type='checkbox'] {
     @apply accent-violet-500 mr-1.5;
+  }
+
+  /* Images */
+  .note-prose img {
+    @apply max-w-full rounded-lg border border-zinc-800 my-4 shadow-lg;
   }
 }

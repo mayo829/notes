@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useNotesStore } from '../store/useNotesStore'
-import { useCodeMirror } from '../hooks/useCodeMirror'
+import { useCodeMirror, uploadAndInsert } from '../hooks/useCodeMirror'
 
 function FolderPicker({ currentFolderId, folders, onSelect }) {
   const [open, setOpen] = useState(false)
@@ -63,6 +63,8 @@ export default function NoteEditor({ note }) {
   const saveTimer = useRef(null)
   const contentRef = useRef(note.content)
   const editorContainerRef = useRef(null)
+  const imageInputRef = useRef(null)
+  const cmViewRef = useRef(null)
 
   // Sync local state when switching notes
   useEffect(() => {
@@ -111,12 +113,21 @@ export default function NoteEditor({ note }) {
     }
   }
 
-  // Mount CodeMirror
-  useCodeMirror({
+  // Mount CodeMirror — get back the viewRef so we can insert images into it
+  cmViewRef.current = useCodeMirror({
     containerRef: editorContainerRef,
     value: note.content,
     onChange: handleContentChange,
   })
+
+  const handleImageUpload = (e) => {
+    const files = [...(e.target.files ?? [])]
+    files.forEach((file) => {
+      if (!file.type.startsWith('image/')) return
+      uploadAndInsert(cmViewRef.current, file)
+    })
+    e.target.value = ''
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -132,6 +143,26 @@ export default function NoteEditor({ note }) {
           />
         </div>
         <div className="flex items-center gap-2">
+          {/* Image upload */}
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleImageUpload}
+          />
+          <button
+            onClick={() => imageInputRef.current?.click()}
+            title="Insert image (or paste / drag-drop)"
+            className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200 px-2.5 py-1.5 rounded-md hover:bg-zinc-800 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            </svg>
+            Image
+          </button>
+
           <button
             onClick={() => setIsEditing(false)}
             className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200 px-2.5 py-1.5 rounded-md hover:bg-zinc-800 transition-colors"

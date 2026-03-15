@@ -137,6 +137,19 @@ export default function NoteViewer({ note }) {
     a({ href, children }) {
       return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
     },
+    img({ src, alt }) {
+      return (
+        <span className="block my-4">
+          <img
+            src={src}
+            alt={alt ?? ''}
+            className="max-w-full rounded-lg border border-zinc-800 shadow-lg"
+            loading="lazy"
+          />
+          {alt && <span className="block text-xs text-zinc-600 mt-1.5 text-center italic">{alt}</span>}
+        </span>
+      )
+    },
     code({ inline, className, children }) {
       if (inline) return <code>{children}</code>
       return <CodeBlock language={className}>{children}</CodeBlock>

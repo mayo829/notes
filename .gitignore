@@ -4,3 +4,5 @@ dist
 *.local
 src/data/backups/
 src/data/*.tmp.*
+# public/images/*
+# !public/images/.gitkeep
