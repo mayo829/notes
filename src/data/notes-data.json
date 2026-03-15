@@ -18,13 +18,22 @@
   ],
   "notes": [
     {
-      "id": "c7b254cf-ea2c-4d36-bb71-cd8698688e15",
-      "title": "Growing instagram",
+      "id": "28fdfca2-9fc7-496b-805a-1258eecb3461",
+      "title": "2026 Social Media Content Creation",
       "folderId": "598761ca-793b-43f0-a19e-a36c2370ab61",
-      "content": "# Growing instagram\n\n-   Have a niche\n-   Find trending content in the niche, make 10 videos with a few different variations of each, test them, find a pattern between the top 3 performing ones, keep posting that pattern\n-   Hook should be tailored towards grabbing the interest of your niche. I watched a video ad because I was interested in them since I am competing against them\n\n[https://www.youtube.com/watch?v=JLfkBRRvtPc](https://www.youtube.com/watch?v=JLfkBRRvtPc)\n\n-   Like and save content in my niche to train account to show me only that niche\n-   Find trending audio first, edit around it\n-   Add polls and engage with audience![image](/notes/images/image-1.png)\n-   Caption: ![](https://mail.google.com/mail/u/0?ui=2&ik=71d65d317f&attid=0.2&permmsgid=msg-f:1859508410103707478&th=19ce4d0c01153756&view=fimg&fur=ip&permmsgid=msg-f:1859508410103707478&sz=s0-l75-ft&attbid=ANGjdJ_z15mARHQTSCgfw2Pvj17xDtBI9oG-HaDbCuGZoMhd8lV1azffnErFRhNghWpqHI3wqeRlxITEFx4RFwU5la84fVhfEHUDzOJ0NNHdD2tavs211bXpbqgXAvg&disp=emb&zw)\n-   Pin CTA on top performing reels\n    -   Use bio to explain why they should follow\n\n-   Use keywords that relate to niche, describe account (what I do), value I provide and why should follow, and community (join the community)\n\n-   Put keywords on videos\n-   Core audience needs to find interesting, valuable, entertaining\n\n-   Insta algo:\n\n    -   Pushes out incrementally to more people based on completion time/watch time/retention/replays, shares, saves, comments, likes, follows after watching\n    -   Compares performance to other reels that were tested in that niche, if good then pushes further\n    -   Audience match targeting based on captions and video transcription\n\n",
+      "content": "# 2026 Social Media Content Creation\n\n- SPCL\n   - Status: control or have access to a scarce resource that other people want. Ex) having lots of money means you have a resource being money that everyone wants\n   - Power: saying something that when someone complies, leads to something positive. Ex) someone says to buy 10 stocks, and you do and you make lots of moeny\n   - Credibility: proof of acomplishment\n   - Likeliness/relatability: how relatable you are to someone else and how alike are you. Ex) vibe with each other, personalities match, same gender, same similar values (want to get rich).\n\n- Social media is moving towards interests and what people find most interesting (all social media algorithms to maximize watch time and time spent on app)\n\n- strategy for 2026 is to make 10 pieces of content per day. Either livestream (best) or make a long video (second best), then make shorts from the longer video to draw people to watch the livestream/long video on youtube.\n- make interesting videos and will keep watching",
       "tags": [],
-      "createdAt": "2026-03-15T00:17:41.258Z",
-      "updatedAt": "2026-03-15T00:18:54.918Z"
+      "createdAt": "2026-03-12T02:54:12.167Z",
+      "updatedAt": "2026-03-12T03:14:29.110Z"
+    },
+    {
+      "id": "0c46aeeb-f8a6-46fb-98c0-fc10087e59df",
+      "title": "Caches",
+      "folderId": "15443903-70b2-42d5-a2af-cc2b23d0ced4",
+      "content": "# Caches - Appendix B\n\n- Set-associative usually used in GPUs:\n  - Set-associative basically good for many threads since many threads=many different sets of reused code at different parts in the program\n  - GPUs run thousands of threads at once, and each thread accesses different pieces of data. If the cache were direct-mapped, many threads might try to store their data in the same cache line, causing conflicts and evictions. Set-associative caches let each “set” hold multiple lines, so threads accessing different data can coexist in the cache without constantly kicking each other out. This reduces conflicts and improves performance.\n- Instruction cache and data cache are separated for performance since pipeline accesses instruction in fetch stage and data in ex stage at same time, which cache only has one port causing structural hazard\n- Cache optimizations - Appendix B2\n  - Hierarchy of cache (L1,L2) with increasing size allows for more chance of cache hit since larger cache increases probability (decreasing miss penalty)\n\n",
+      "tags": [],
+      "createdAt": "2026-03-14T23:57:52.686Z",
+      "updatedAt": "2026-03-14T23:59:17.061Z"
     },
     {
       "id": "27bd4560-f56a-4f7d-aa10-5c1afdba68a1",
@@ -36,6 +45,15 @@
       "updatedAt": "2026-03-15T00:16:55.871Z"
     },
     {
+      "id": "c7b254cf-ea2c-4d36-bb71-cd8698688e15",
+      "title": "Growing instagram",
+      "folderId": "598761ca-793b-43f0-a19e-a36c2370ab61",
+      "content": "# Growing instagram\n\n-   Have a niche\n-   Find trending content in the niche, make 10 videos with a few different variations of each, test them, find a pattern between the top 3 performing ones, keep posting that pattern\n-   Hook should be tailored towards grabbing the interest of your niche. I watched a video ad because I was interested in them since I am competing against them\n\n[https://www.youtube.com/watch?v=JLfkBRRvtPc](https://www.youtube.com/watch?v=JLfkBRRvtPc)\n\n-   Like and save content in my niche to train account to show me only that niche\n-   Find trending audio first, edit around it\n-   Add polls and engage with audience![image](/notes/images/image-1.png)\n-   Caption: ![](https://mail.google.com/mail/u/0?ui=2&ik=71d65d317f&attid=0.2&permmsgid=msg-f:1859508410103707478&th=19ce4d0c01153756&view=fimg&fur=ip&permmsgid=msg-f:1859508410103707478&sz=s0-l75-ft&attbid=ANGjdJ_z15mARHQTSCgfw2Pvj17xDtBI9oG-HaDbCuGZoMhd8lV1azffnErFRhNghWpqHI3wqeRlxITEFx4RFwU5la84fVhfEHUDzOJ0NNHdD2tavs211bXpbqgXAvg&disp=emb&zw)\n-   Pin CTA on top performing reels\n    -   Use bio to explain why they should follow\n\n-   Use keywords that relate to niche, describe account (what I do), value I provide and why should follow, and community (join the community)\n\n-   Put keywords on videos\n-   Core audience needs to find interesting, valuable, entertaining\n\n-   Insta algo:\n\n    -   Pushes out incrementally to more people based on completion time/watch time/retention/replays, shares, saves, comments, likes, follows after watching\n    -   Compares performance to other reels that were tested in that niche, if good then pushes further\n    -   Audience match targeting based on captions and video transcription\n\n",
+      "tags": [],
+      "createdAt": "2026-03-15T00:17:41.258Z",
+      "updatedAt": "2026-03-15T00:18:54.918Z"
+    },
+    {
       "id": "8ed78200-c4ac-4a05-82d1-54371f9d00a3",
       "title": "Instruction Set Architecture",
       "folderId": "15443903-70b2-42d5-a2af-cc2b23d0ced4",
@@ -45,13 +63,16 @@
       "updatedAt": "2026-03-14T23:59:24.635Z"
     },
     {
-      "id": "0c46aeeb-f8a6-46fb-98c0-fc10087e59df",
-      "title": "Caches",
-      "folderId": "15443903-70b2-42d5-a2af-cc2b23d0ced4",
-      "content": "# Caches - Appendix B\n\n- Set-associative usually used in GPUs:\n  - Set-associative basically good for many threads since many threads=many different sets of reused code at different parts in the program\n  - GPUs run thousands of threads at once, and each thread accesses different pieces of data. If the cache were direct-mapped, many threads might try to store their data in the same cache line, causing conflicts and evictions. Set-associative caches let each “set” hold multiple lines, so threads accessing different data can coexist in the cache without constantly kicking each other out. This reduces conflicts and improves performance.\n- Instruction cache and data cache are separated for performance since pipeline accesses instruction in fetch stage and data in ex stage at same time, which cache only has one port causing structural hazard\n- Cache optimizations - Appendix B2\n  - Hierarchy of cache (L1,L2) with increasing size allows for more chance of cache hit since larger cache increases probability (decreasing miss penalty)\n\n",
-      "tags": [],
-      "createdAt": "2026-03-14T23:57:52.686Z",
-      "updatedAt": "2026-03-14T23:59:17.061Z"
+      "id": "markdown-guide",
+      "title": "Markdown Guide",
+      "folderId": "folder-meta",
+      "content": "# Markdown Guide\n\nA quick reference for Markdown syntax supported in Notes.\n\n## Text Formatting\n\n**Bold**, *italic*, ~~strikethrough~~, `inline code`\n\n## Headings\n\nUse `#` through `######` for headings.\n\n## Lists\n\n- Unordered item\n- Another item\n  - Nested item\n\n1. Ordered item\n2. Second item\n\n## Links\n\n- External: [OpenAI](https://openai.com)\n- Wiki link to another note: [[Welcome to Notes]]\n\n## Code Blocks\n\n```js\nconst greet = (name) => `Hello, ${name}!`\nconsole.log(greet('world'))\n```\n\n## Blockquotes\n\n> This is a blockquote.\n\n## Tables\n\n| Column A | Column B |\n|----------|----------|\n| Cell 1   | Cell 2   |\n| Cell 3   | Cell 4   |\n\n## Horizontal Rule\n\n---\n\nBack to [[Welcome to Notes]].\n",
+      "tags": [
+        "reference",
+        "meta"
+      ],
+      "createdAt": "2026-01-02T00:00:00.000Z",
+      "updatedAt": "2026-03-12T03:13:38.206Z"
     },
     {
       "id": "ceab9548-f7bc-4f30-8c5f-bd0563107713",
@@ -72,25 +93,13 @@
       "updatedAt": "2026-03-12T03:34:27.774Z"
     },
     {
-      "id": "28fdfca2-9fc7-496b-805a-1258eecb3461",
-      "title": "2026 Social Media Content Creation",
-      "folderId": "598761ca-793b-43f0-a19e-a36c2370ab61",
-      "content": "# 2026 Social Media Content Creation\n\n- SPCL\n   - Status: control or have access to a scarce resource that other people want. Ex) having lots of money means you have a resource being money that everyone wants\n   - Power: saying something that when someone complies, leads to something positive. Ex) someone says to buy 10 stocks, and you do and you make lots of moeny\n   - Credibility: proof of acomplishment\n   - Likeliness/relatability: how relatable you are to someone else and how alike are you. Ex) vibe with each other, personalities match, same gender, same similar values (want to get rich).\n\n- Social media is moving towards interests and what people find most interesting (all social media algorithms to maximize watch time and time spent on app)\n\n- strategy for 2026 is to make 10 pieces of content per day. Either livestream (best) or make a long video (second best), then make shorts from the longer video to draw people to watch the livestream/long video on youtube.\n- make interesting videos and will keep watching",
+      "id": "cfc56ea5-5d99-4c4a-a46e-ab30d13162db",
+      "title": "Verilator",
+      "folderId": "15443903-70b2-42d5-a2af-cc2b23d0ced4",
+      "content": "# q1 verilator install\n\n- Verilator basically compiles verilog code into c++ so that it can run much faster than other simulators\n- When top->eval() is called, this basically halts main, and runs the verilog c++ thread with all updated variables. Its important to note that verilator optimizes c++ code so sometimes updates wil l still occur in hardware even if eval is not called since behind the scenes, things like assign/wires are just references so they update automatically even without eval being called.",
       "tags": [],
-      "createdAt": "2026-03-12T02:54:12.167Z",
-      "updatedAt": "2026-03-12T03:14:29.110Z"
-    },
-    {
-      "id": "markdown-guide",
-      "title": "Markdown Guide",
-      "folderId": "folder-meta",
-      "content": "# Markdown Guide\n\nA quick reference for Markdown syntax supported in Notes.\n\n## Text Formatting\n\n**Bold**, *italic*, ~~strikethrough~~, `inline code`\n\n## Headings\n\nUse `#` through `######` for headings.\n\n## Lists\n\n- Unordered item\n- Another item\n  - Nested item\n\n1. Ordered item\n2. Second item\n\n## Links\n\n- External: [OpenAI](https://openai.com)\n- Wiki link to another note: [[Welcome to Notes]]\n\n## Code Blocks\n\n```js\nconst greet = (name) => `Hello, ${name}!`\nconsole.log(greet('world'))\n```\n\n## Blockquotes\n\n> This is a blockquote.\n\n## Tables\n\n| Column A | Column B |\n|----------|----------|\n| Cell 1   | Cell 2   |\n| Cell 3   | Cell 4   |\n\n## Horizontal Rule\n\n---\n\nBack to [[Welcome to Notes]].\n",
-      "tags": [
-        "reference",
-        "meta"
-      ],
-      "createdAt": "2026-01-02T00:00:00.000Z",
-      "updatedAt": "2026-03-12T03:13:38.206Z"
+      "createdAt": "2026-03-15T01:29:19.676Z",
+      "updatedAt": "2026-03-15T04:05:03.018Z"
     },
     {
       "id": "welcome",
