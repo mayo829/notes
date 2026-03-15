@@ -10,6 +10,7 @@ function extractWikiLinks(content) {
 
 // Returns a tree structure from flat folders array
 export function buildFolderTree(folders) {
+  const alpha = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
   const map = {}
   folders.forEach((f) => { map[f.id] = { ...f, children: [] } })
   const roots = []
@@ -20,7 +21,12 @@ export function buildFolderTree(folders) {
       roots.push(map[f.id])
     }
   })
-  return roots
+  const sortTree = (nodes) => {
+    nodes.sort(alpha)
+    nodes.forEach((n) => sortTree(n.children))
+    return nodes
+  }
+  return sortTree(roots)
 }
 
 function getAllDescendantIds(folders, folderId) {
@@ -33,6 +39,12 @@ function getAllDescendantIds(folders, folderId) {
 // Serialise current state to the same shape as notes-data.json
 export function serialiseData(notes, folders) {
   return JSON.stringify({ folders, notes }, null, 2)
+}
+
+function sortAlpha(notes) {
+  return [...notes].sort((a, b) =>
+    a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
+  )
 }
 
 
@@ -229,12 +241,12 @@ export const useNotesStore = create(
 
       getNotesInFolder: (folderId) => {
         const { notes } = get()
-        return notes.filter((n) => n.folderId === folderId)
+        return sortAlpha(notes.filter((n) => n.folderId === folderId))
       },
 
       getUnfiledNotes: () => {
         const { notes } = get()
-        return notes.filter((n) => !n.folderId)
+        return sortAlpha(notes.filter((n) => !n.folderId))
       },
 
       getFilteredNotes: () => {
@@ -261,7 +273,7 @@ export const useNotesStore = create(
               n.tags.some((t) => t.toLowerCase().includes(q))
           )
         }
-        return result
+        return sortAlpha(result)
       },
     }),
     {
@@ -290,7 +302,7 @@ export const useNotesStore = create(
         const mergedFolders = Object.values({ ...seedFolderMap, ...lsFolderMap })
 
         // Sort notes newest-first
-        mergedNotes.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+        mergedNotes.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }))
 
         return {
           ...currentState,
