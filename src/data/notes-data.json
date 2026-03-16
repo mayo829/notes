@@ -75,6 +75,15 @@
       "updatedAt": "2026-03-12T03:13:38.206Z"
     },
     {
+      "id": "892e012a-8824-4c23-82b4-b69ba1f4bee8",
+      "title": "Modern CPU Concepts, Definitions, and more",
+      "folderId": "15443903-70b2-42d5-a2af-cc2b23d0ced4",
+      "content": "# Modern CPU Concepts, Definitions, and more\n\n## [NVIDIA Vera CPU](https://www.nvidia.com/en-us/data-center/vera-cpu/)\n\n## Concepts and Definitions\n\n### AI\n- Edge AI: running AI algorithms, such as neural networks, on local hardware (edge of a network) rather than running through the cloud. For example, running computer vision models right on a smartphone via accelerated hardware.\n\n\n### Hardware\n- KV cache: key-value cache is a crucial technique for accelerating Large Language Model (LLM) inference by storing the keys and values of previous tokens in memory\n- [HPC High performance compute](https://www.nvidia.com/en-us/glossary/high-performance-computing/)",
+      "tags": [],
+      "createdAt": "2026-03-16T01:15:15.327Z",
+      "updatedAt": "2026-03-16T02:07:18.524Z"
+    },
+    {
       "id": "ceab9548-f7bc-4f30-8c5f-bd0563107713",
       "title": "Pipelineing",
       "folderId": "15443903-70b2-42d5-a2af-cc2b23d0ced4",
