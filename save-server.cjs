@@ -92,6 +92,7 @@ app.use(express.json({ limit: '50mb' })) // larger limit for image data URIs dur
 // HEAD /api/save — used by the frontend to detect dev mode
 app.head('/api/save', (_req, res) => res.sendStatus(200))
 
+
 app.post('/api/save', (req, res) => {
   // 1. Validate shape
   const err = validate(req.body)
@@ -150,10 +151,7 @@ app.post('/api/upload-image', (req, res) => {
 
   try {
     fs.writeFileSync(dest, buffer)
-    // In dev, Vite serves /public at root, so the path is /images/<file>.
-    // In production (GitHub Pages with base /notes/), it becomes /notes/images/<file>.
     console.log(`[save-server] image saved → ${dest}`)
-    // Return just the filename — the frontend prepends import.meta.env.BASE_URL
     res.json({ ok: true, filename: unique })
   } catch (err) {
     console.error('[save-server] image write failed:', err.message)

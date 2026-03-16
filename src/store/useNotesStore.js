@@ -253,11 +253,14 @@ export const useNotesStore = create(
         const { notes, folders, searchQuery, activeTag, activeFolderId } = get()
         let result = notes
 
-        if (activeFolderId === '__unfiled__') {
-          result = result.filter((n) => !n.folderId)
-        } else if (activeFolderId) {
-          const ids = new Set(getAllDescendantIds(folders, activeFolderId))
-          result = result.filter((n) => ids.has(n.folderId))
+        // When searching by text, scan all notes regardless of active folder
+        if (!searchQuery.trim()) {
+          if (activeFolderId === '__unfiled__') {
+            result = result.filter((n) => !n.folderId)
+          } else if (activeFolderId) {
+            const ids = new Set(getAllDescendantIds(folders, activeFolderId))
+            result = result.filter((n) => ids.has(n.folderId))
+          }
         }
 
         if (activeTag) {

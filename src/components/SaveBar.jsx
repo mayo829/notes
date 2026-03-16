@@ -20,7 +20,6 @@ export default function SaveBar() {
   const [flash, setFlash] = useState(null) // { type: 'ok'|'err', msg }
   const [importing, setImporting] = useState(false)
   const [importError, setImportError] = useState(null)
-  // Whether the dev save server is reachable
   const [devMode, setDevMode] = useState(false)
 
   // Probe once on mount to see if the save server is available
@@ -42,7 +41,6 @@ export default function SaveBar() {
     setSaving(true)
     try {
       if (devMode) {
-        // Dev: write directly to src/data/notes-data.json via local server
         const res = await fetch('/api/save', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -50,7 +48,7 @@ export default function SaveBar() {
         })
         if (!res.ok) throw new Error('Server error')
         useNotesStore.setState({ isDirty: false, lastSavedAt: new Date().toISOString() })
-        showFlash('ok', 'Saved to src/data/notes-data.json')
+        showFlash('ok', 'Saved ✓')
       } else {
         // Production / no server: download the file
         const blob = new Blob([serialiseData(notes, folders)], { type: 'application/json' })
@@ -144,7 +142,7 @@ export default function SaveBar() {
       <button
         onClick={handleSave}
         disabled={saving}
-        title={devMode ? 'Save to src/data/notes-data.json (Ctrl+S)' : 'Download notes-data.json (Ctrl+S)'}
+        title={devMode ? 'Save to notes-data.json (Ctrl+S)' : 'Download notes-data.json (Ctrl+S)'}
         className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border transition-colors font-medium disabled:opacity-50 ${
           isDirty
             ? 'bg-accent-500/20 text-accent-400 border-accent-500/40 hover:bg-accent-500/30'

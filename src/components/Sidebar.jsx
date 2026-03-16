@@ -334,21 +334,12 @@ export default function Sidebar({ onClose }) {
             </button>
           )}
         </div>
-        {/* AI model status pill */}
-        {modelStatus === 'loading' && (
+        {/* AI model loading indicator — only shown while actively loading */}
+        {modelStatus === 'loading' && searchQuery && (
           <div className="mt-1.5 flex items-center gap-1.5 text-xs text-zinc-600">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-            Loading AI model…
+            Loading AI model for smart search…
           </div>
-        )}
-        {modelStatus === 'ready' && !searchQuery && (
-          <div className="mt-1.5 flex items-center gap-1.5 text-xs text-zinc-700">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            AI search ready
-          </div>
-        )}
-        {modelStatus === 'error' && (
-          <div className="mt-1.5 text-xs text-red-700">AI unavailable</div>
         )}
       </div>
 
