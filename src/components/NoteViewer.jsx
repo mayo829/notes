@@ -154,77 +154,68 @@ function FlashCard({ question, answer, components }) {
 
   return (
     <>
-      <div className="my-5 rounded-xl border border-accent-700/40 bg-accent-950/20 overflow-hidden">
-        {/* Question header */}
-        <div className="flex items-center gap-2 px-4 py-2 bg-accent-900/30 border-b border-accent-700/30">
-          <svg className="w-3.5 h-3.5 text-accent-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-          </svg>
-          <span className="text-xs font-semibold text-accent-400 uppercase tracking-wider">Question</span>
+      {/* Card */}
+      <div className="my-6 group relative pl-4 border-l-2 border-zinc-700 hover:border-accent-500/60 transition-colors duration-200">
+        {/* Question text with inline Q: label */}
+        <div className="flex items-baseline gap-2">
+          <span className="shrink-0 text-[10px] font-semibold tracking-widest text-zinc-600 uppercase select-none">Q:</span>
+          <div className="flex-1 min-w-0 note-prose text-zinc-200">
+            {question
+              ? <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>{question}</ReactMarkdown>
+              : <span className="text-zinc-600 italic text-sm">No question yet.</span>}
+          </div>
         </div>
-        {/* Question body */}
-        <div className="px-4 py-3 note-prose">
-          {question ? (
-            <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>{question}</ReactMarkdown>
-          ) : (
-            <p className="text-zinc-600 italic text-sm">No question text yet.</p>
-          )}
-        </div>
-        {/* Show answer button */}
-        <div className="px-4 py-3 border-t border-accent-800/30 flex justify-end">
-          <button
-            onClick={() => setOpen(true)}
-            className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-accent-500/20 text-accent-300 border border-accent-500/30 hover:bg-accent-500/30 transition-colors"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Show Answer
-          </button>
-        </div>
+        {/* Reveal button */}
+        <button
+          onClick={() => setOpen(true)}
+          className="mt-3 text-xs text-zinc-600 hover:text-accent-400 transition-colors duration-150 flex items-center gap-1.5"
+        >
+          <span className="w-3.5 h-px bg-current inline-block" />
+          show answer
+        </button>
       </div>
 
-      {/* Answer modal */}
+      {/* Answer overlay */}
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-4 sm:p-8 bg-black/60 backdrop-blur-sm"
           onClick={() => setOpen(false)}
         >
           <div
-            className="relative w-full max-w-lg rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl overflow-hidden"
+            className="w-full max-w-xl rounded-2xl bg-zinc-950 border border-zinc-800 shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal header */}
-            <div className="flex items-center justify-between px-5 py-3 bg-zinc-800/60 border-b border-zinc-700">
-              <div className="flex items-center gap-2">
-                <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
-                <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Answer</span>
-              </div>
-              <button
-                onClick={() => setOpen(false)}
-                className="text-zinc-500 hover:text-zinc-200 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            {/* Recap question */}
-            {question && (
-              <div className="px-5 py-3 border-b border-zinc-800 text-xs text-zinc-500 italic">
+            {/* Thin accent stripe */}
+            <div className="h-px bg-gradient-to-r from-accent-500/60 via-accent-400/30 to-transparent" />
+
+            <div className="px-6 pt-5 pb-6">
+              {/* Question recap */}
+              <p className="text-[10px] font-semibold tracking-widest text-zinc-600 uppercase mb-1 select-none">Q</p>
+              <div className="text-sm text-zinc-500 leading-relaxed mb-5 line-clamp-3">
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>{question}</ReactMarkdown>
               </div>
-            )}
-            {/* Answer body */}
-            <div className="px-5 py-4 note-prose max-h-[60vh] overflow-y-auto">
-              {answer ? (
-                <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>{answer}</ReactMarkdown>
-              ) : (
-                <p className="text-zinc-600 italic text-sm">No answer written yet.</p>
-              )}
+
+              {/* Divider */}
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex-1 h-px bg-zinc-800" />
+                <span className="text-[10px] font-semibold tracking-widest text-accent-500/70 uppercase select-none">Answer</span>
+                <div className="flex-1 h-px bg-zinc-800" />
+              </div>
+
+              {/* Answer */}
+              <div className="note-prose text-zinc-200 max-h-[50vh] overflow-y-auto pr-1">
+                {answer
+                  ? <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>{answer}</ReactMarkdown>
+                  : <span className="text-zinc-600 italic text-sm">No answer yet.</span>}
+              </div>
+
+              {/* Close */}
+              <button
+                onClick={() => setOpen(false)}
+                className="mt-6 w-full py-2 rounded-lg text-xs text-zinc-600 hover:text-zinc-300 hover:bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors"
+              >
+                close
+              </button>
             </div>
           </div>
         </div>
