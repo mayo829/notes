@@ -8,6 +8,10 @@ export default defineConfig({
     exclude: ['@xenova/transformers'],
   },
   server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
     proxy: {
       '/api': 'http://localhost:3747',
     },

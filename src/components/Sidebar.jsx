@@ -269,9 +269,16 @@ export default function Sidebar({ onClose }) {
 
   const isSearching = searchQuery.trim() || activeTag
 
-  // Exact-match IDs for the AI hook to exclude duplicates
+  // Pagination for keyword results
+  const PAGE = 20
+  const [visibleCount, setVisibleCount] = useState(PAGE)
+  useEffect(() => { setVisibleCount(PAGE) }, [searchQuery, activeTag])
+  const visibleNotes    = filteredNotes.slice(0, visibleCount)
+  const hasMoreKeyword  = filteredNotes.length > visibleCount
+
+  // Exact-match IDs for the AI hook to exclude from related results
   const exactIds = useMemo(() => new Set(filteredNotes.map((n) => n.id)), [filteredNotes])
-  const { semanticResults, modelStatus } = useSemanticSearch(notes, searchQuery, exactIds)
+  const { results: semanticResults } = useSemanticSearch(notes, searchQuery, exactIds)
 
   const handleNoteClick = (id) => {
     setActiveNote(id)
@@ -334,13 +341,6 @@ export default function Sidebar({ onClose }) {
             </button>
           )}
         </div>
-        {/* AI model loading indicator — only shown while actively loading */}
-        {modelStatus === 'loading' && searchQuery && (
-          <div className="mt-1.5 flex items-center gap-1.5 text-xs text-zinc-600">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-            Loading AI model for smart search…
-          </div>
-        )}
       </div>
 
       {/* Tags */}
@@ -391,46 +391,67 @@ export default function Sidebar({ onClose }) {
       {/* Tree / search results */}
       <div className="flex-1 overflow-y-auto px-2 pb-4">
         {isSearching ? (
-          // Flat search results
-          <div className="space-y-0.5 pt-1">
-            {/* Exact / keyword matches */}
-            <p className="text-xs text-zinc-600 px-2 pb-1 uppercase tracking-wider">
-              {filteredNotes.length} match{filteredNotes.length !== 1 ? 'es' : ''}
-            </p>
-            {filteredNotes.length === 0 && semanticResults.length === 0 ? (
-              <p className="text-zinc-700 text-xs text-center mt-6">No notes match.</p>
-            ) : (
-              filteredNotes.map((note) => (
-                <NoteRow
-                  key={note.id}
-                  note={note}
-                  depth={0}
-                  isActive={activeNoteId === note.id}
-                  onClick={() => handleNoteClick(note.id)}
-                />
-              ))
+          <div className="pt-1">
+            {/* ── Keyword matches ── */}
+            {filteredNotes.length > 0 && (
+              <div className="mb-2">
+                <div className="flex items-center gap-1.5 px-2 pb-1.5">
+                  <svg className="w-3 h-3 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                  </svg>
+                  <span className="text-xs font-medium text-emerald-600 uppercase tracking-wider">
+                    {filteredNotes.length} match{filteredNotes.length !== 1 ? 'es' : ''}
+                  </span>
+                </div>
+                <div className="space-y-0.5">
+                  {visibleNotes.map((note) => (
+                    <NoteRow
+                      key={note.id}
+                      note={note}
+                      depth={0}
+                      isActive={activeNoteId === note.id}
+                      onClick={() => handleNoteClick(note.id)}
+                    />
+                  ))}
+                </div>
+                {hasMoreKeyword && (
+                  <button
+                    onClick={() => setVisibleCount((c) => c + PAGE)}
+                    className="w-full mt-1.5 py-1.5 text-xs text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded-md transition-colors border border-dashed border-zinc-800 hover:border-zinc-700"
+                  >
+                    Load {Math.min(PAGE, filteredNotes.length - visibleCount)} more
+                    <span className="ml-1 text-zinc-700">({filteredNotes.length - visibleCount} remaining)</span>
+                  </button>
+                )}
+              </div>
             )}
 
-            {/* AI semantic results */}
+            {/* ── Related notes (semantic / BM25) ── */}
             {semanticResults.length > 0 && (
-              <div className="mt-3">
-                <div className="px-2 pb-1.5 flex items-center gap-1.5">
+              <div className={filteredNotes.length > 0 ? 'mt-3 pt-3 border-t border-zinc-800/60' : ''}>
+                <div className="flex items-center gap-1.5 px-2 pb-1.5">
                   <svg className="w-3 h-3 text-accent-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                   </svg>
-                  <span className="text-xs text-zinc-600 uppercase tracking-wider">AI related</span>
+                  <span className="text-xs font-medium text-accent-500/70 uppercase tracking-wider">Related</span>
                 </div>
-                {semanticResults.map((note) => (
-                  <NoteRow
-                    key={note.id}
-                    note={note}
-                    depth={0}
-                    isActive={activeNoteId === note.id}
-                    onClick={() => handleNoteClick(note.id)}
-                    dimmed
-                  />
-                ))}
+                <div className="space-y-0.5">
+                  {semanticResults.map((note) => (
+                    <NoteRow
+                      key={note.id}
+                      note={note}
+                      depth={0}
+                      isActive={activeNoteId === note.id}
+                      onClick={() => handleNoteClick(note.id)}
+                      dimmed
+                    />
+                  ))}
+                </div>
               </div>
+            )}
+
+            {filteredNotes.length === 0 && semanticResults.length === 0 && (
+              <p className="text-zinc-700 text-xs text-center mt-8">No notes match.</p>
             )}
           </div>
         ) : (
