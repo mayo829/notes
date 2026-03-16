@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { useNotesStore, buildFolderTree } from '../store/useNotesStore'
+import useSemanticSearch from '../hooks/useSemanticSearch'
 
 function timeAgo(iso) {
   const diff = Date.now() - new Date(iso).getTime()
@@ -215,16 +216,23 @@ function FolderRow({ folder, depth, onClose }) {
   )
 }
 
-function NoteRow({ note, depth, isActive, onClick }) {
+function NoteRow({ note, depth, isActive, onClick, dimmed = false }) {
   return (
     <button
       onClick={onClick}
       className={`w-full text-left flex items-center gap-1.5 rounded-md py-1.5 pr-3 transition-colors group ${
-        isActive ? 'bg-accent-500/15 text-zinc-100' : 'text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300'
+        isActive
+          ? 'bg-accent-500/15 text-zinc-100'
+          : dimmed
+          ? 'text-zinc-600 hover:bg-zinc-800 hover:text-zinc-400'
+          : 'text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300'
       }`}
       style={{ paddingLeft: `${12 + depth * 16}px` }}
     >
-      <svg className="w-3 h-3 shrink-0 text-zinc-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <svg
+        className={`w-3 h-3 shrink-0 ${dimmed ? 'text-accent-600/50' : 'text-zinc-700'}`}
+        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+      >
         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
       </svg>
       <span className="flex-1 text-sm truncate">{note.title}</span>
@@ -237,6 +245,7 @@ export default function Sidebar({ onClose }) {
   const {
     activeNoteId,
     activeFolderId,
+    notes,
     searchQuery,
     activeTag,
     folders,
@@ -259,6 +268,10 @@ export default function Sidebar({ onClose }) {
   const folderTree = buildFolderTree(folders)
 
   const isSearching = searchQuery.trim() || activeTag
+
+  // Exact-match IDs for the AI hook to exclude duplicates
+  const exactIds = useMemo(() => new Set(filteredNotes.map((n) => n.id)), [filteredNotes])
+  const { semanticResults, modelStatus } = useSemanticSearch(notes, searchQuery, exactIds)
 
   const handleNoteClick = (id) => {
     setActiveNote(id)
@@ -321,6 +334,22 @@ export default function Sidebar({ onClose }) {
             </button>
           )}
         </div>
+        {/* AI model status pill */}
+        {modelStatus === 'loading' && (
+          <div className="mt-1.5 flex items-center gap-1.5 text-xs text-zinc-600">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+            Loading AI model…
+          </div>
+        )}
+        {modelStatus === 'ready' && !searchQuery && (
+          <div className="mt-1.5 flex items-center gap-1.5 text-xs text-zinc-700">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            AI search ready
+          </div>
+        )}
+        {modelStatus === 'error' && (
+          <div className="mt-1.5 text-xs text-red-700">AI unavailable</div>
+        )}
       </div>
 
       {/* Tags */}
@@ -373,10 +402,11 @@ export default function Sidebar({ onClose }) {
         {isSearching ? (
           // Flat search results
           <div className="space-y-0.5 pt-1">
-            <p className="text-xs text-zinc-600 px-2 pb-1">
-              {filteredNotes.length} result{filteredNotes.length !== 1 ? 's' : ''}
+            {/* Exact / keyword matches */}
+            <p className="text-xs text-zinc-600 px-2 pb-1 uppercase tracking-wider">
+              {filteredNotes.length} match{filteredNotes.length !== 1 ? 'es' : ''}
             </p>
-            {filteredNotes.length === 0 ? (
+            {filteredNotes.length === 0 && semanticResults.length === 0 ? (
               <p className="text-zinc-700 text-xs text-center mt-6">No notes match.</p>
             ) : (
               filteredNotes.map((note) => (
@@ -388,6 +418,28 @@ export default function Sidebar({ onClose }) {
                   onClick={() => handleNoteClick(note.id)}
                 />
               ))
+            )}
+
+            {/* AI semantic results */}
+            {semanticResults.length > 0 && (
+              <div className="mt-3">
+                <div className="px-2 pb-1.5 flex items-center gap-1.5">
+                  <svg className="w-3 h-3 text-accent-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                  </svg>
+                  <span className="text-xs text-zinc-600 uppercase tracking-wider">AI related</span>
+                </div>
+                {semanticResults.map((note) => (
+                  <NoteRow
+                    key={note.id}
+                    note={note}
+                    depth={0}
+                    isActive={activeNoteId === note.id}
+                    onClick={() => handleNoteClick(note.id)}
+                    dimmed
+                  />
+                ))}
+              </div>
             )}
           </div>
         ) : (
