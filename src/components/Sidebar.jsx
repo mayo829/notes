@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
+import React, { useState, useRef } from 'react'
 import { useNotesStore, buildFolderTree } from '../store/useNotesStore'
-import useSemanticSearch from '../hooks/useSemanticSearch'
 
 function timeAgo(iso) {
   const diff = Date.now() - new Date(iso).getTime()
@@ -245,7 +244,6 @@ export default function Sidebar({ onClose }) {
   const {
     activeNoteId,
     activeFolderId,
-    notes,
     searchQuery,
     activeTag,
     folders,
@@ -256,29 +254,14 @@ export default function Sidebar({ onClose }) {
     createNote,
     createFolder,
     getAllTags,
-    getFilteredNotes,
     getUnfiledNotes,
   } = useNotesStore()
 
   const tags = getAllTags()
-  const filteredNotes = getFilteredNotes()
   const unfiledNotes = getUnfiledNotes()
   const [tagsOpen, setTagsOpen] = useState(false)
   const [newFolderInput, setNewFolderInput] = useState(false)
   const folderTree = buildFolderTree(folders)
-
-  const isSearching = searchQuery.trim() || activeTag
-
-  // Pagination for keyword results
-  const PAGE = 20
-  const [visibleCount, setVisibleCount] = useState(PAGE)
-  useEffect(() => { setVisibleCount(PAGE) }, [searchQuery, activeTag])
-  const visibleNotes    = filteredNotes.slice(0, visibleCount)
-  const hasMoreKeyword  = filteredNotes.length > visibleCount
-
-  // Exact-match IDs for the AI hook to exclude from related results
-  const exactIds = useMemo(() => new Set(filteredNotes.map((n) => n.id)), [filteredNotes])
-  const { results: semanticResults } = useSemanticSearch(notes, searchQuery, exactIds)
 
   const handleNoteClick = (id) => {
     setActiveNote(id)
@@ -388,127 +371,60 @@ export default function Sidebar({ onClose }) {
 
       <div className="mx-3 border-t border-zinc-800 mb-1 shrink-0" />
 
-      {/* Tree / search results */}
+      {/* Folder tree */}
       <div className="flex-1 overflow-y-auto px-2 pb-4">
-        {isSearching ? (
-          <div className="pt-1">
-            {/* ── Keyword matches ── */}
-            {filteredNotes.length > 0 && (
-              <div className="mb-2">
-                <div className="flex items-center gap-1.5 px-2 pb-1.5">
-                  <svg className="w-3 h-3 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                  </svg>
-                  <span className="text-xs font-medium text-emerald-600 uppercase tracking-wider">
-                    {filteredNotes.length} match{filteredNotes.length !== 1 ? 'es' : ''}
-                  </span>
-                </div>
-                <div className="space-y-0.5">
-                  {visibleNotes.map((note) => (
-                    <NoteRow
-                      key={note.id}
-                      note={note}
-                      depth={0}
-                      isActive={activeNoteId === note.id}
-                      onClick={() => handleNoteClick(note.id)}
-                    />
-                  ))}
-                </div>
-                {hasMoreKeyword && (
-                  <button
-                    onClick={() => setVisibleCount((c) => c + PAGE)}
-                    className="w-full mt-1.5 py-1.5 text-xs text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded-md transition-colors border border-dashed border-zinc-800 hover:border-zinc-700"
-                  >
-                    Load {Math.min(PAGE, filteredNotes.length - visibleCount)} more
-                    <span className="ml-1 text-zinc-700">({filteredNotes.length - visibleCount} remaining)</span>
-                  </button>
-                )}
-              </div>
-            )}
+        <div className="pt-1 space-y-0.5">
+          {/* New folder input */}
+          {newFolderInput && (
+            <div className="px-2 py-1">
+              <RenameInput
+                initial="New Folder"
+                onConfirm={(name) => { createFolder(name, null); setNewFolderInput(false) }}
+                onCancel={() => setNewFolderInput(false)}
+              />
+            </div>
+          )}
 
-            {/* ── Related notes (semantic / BM25) ── */}
-            {semanticResults.length > 0 && (
-              <div className={filteredNotes.length > 0 ? 'mt-3 pt-3 border-t border-zinc-800/60' : ''}>
-                <div className="flex items-center gap-1.5 px-2 pb-1.5">
-                  <svg className="w-3 h-3 text-accent-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                  </svg>
-                  <span className="text-xs font-medium text-accent-500/70 uppercase tracking-wider">Related</span>
-                </div>
-                <div className="space-y-0.5">
-                  {semanticResults.map((note) => (
-                    <NoteRow
-                      key={note.id}
-                      note={note}
-                      depth={0}
-                      isActive={activeNoteId === note.id}
-                      onClick={() => handleNoteClick(note.id)}
-                      dimmed
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+          {/* Folder tree */}
+          {folderTree.map((folder) => (
+            <FolderRow key={folder.id} folder={folder} depth={0} onClose={onClose} />
+          ))}
 
-            {filteredNotes.length === 0 && semanticResults.length === 0 && (
-              <p className="text-zinc-700 text-xs text-center mt-8">No notes match.</p>
-            )}
-          </div>
-        ) : (
-          // Folder tree
-          <div className="pt-1 space-y-0.5">
-            {/* New folder input */}
-            {newFolderInput && (
-              <div className="px-2 py-1">
-                <RenameInput
-                  initial="New Folder"
-                  onConfirm={(name) => { createFolder(name, null); setNewFolderInput(false) }}
-                  onCancel={() => setNewFolderInput(false)}
+          {/* Unfiled notes */}
+          {unfiledNotes.length > 0 && (
+            <div className="mt-1">
+              <button
+                onClick={() => setActiveFolderId(activeFolderId === '__unfiled__' ? null : '__unfiled__')}
+                className={`w-full flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm transition-colors ${
+                  activeFolderId === '__unfiled__'
+                    ? 'bg-accent-500/10 text-zinc-300'
+                    : 'text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300'
+                }`}
+              >
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0 001.06.44H18A2.25 2.25 0 0120.25 9v.776" />
+                </svg>
+                <span className="flex-1 text-left">Unfiled</span>
+                <span className="text-xs text-zinc-600">{unfiledNotes.length}</span>
+              </button>
+              {activeFolderId === '__unfiled__' && unfiledNotes.map((note) => (
+                <NoteRow
+                  key={note.id}
+                  note={note}
+                  depth={1}
+                  isActive={activeNoteId === note.id}
+                  onClick={() => handleNoteClick(note.id)}
                 />
-              </div>
-            )}
+              ))}
+            </div>
+          )}
 
-            {/* Folder tree */}
-            {folderTree.map((folder) => (
-              <FolderRow key={folder.id} folder={folder} depth={0} onClose={onClose} />
-            ))}
-
-            {/* Unfiled notes */}
-            {unfiledNotes.length > 0 && (
-              <div className="mt-1">
-                <button
-                  onClick={() => setActiveFolderId(activeFolderId === '__unfiled__' ? null : '__unfiled__')}
-                  className={`w-full flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm transition-colors ${
-                    activeFolderId === '__unfiled__'
-                      ? 'bg-accent-500/10 text-zinc-300'
-                      : 'text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300'
-                  }`}
-                >
-                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0 001.06.44H18A2.25 2.25 0 0120.25 9v.776" />
-                  </svg>
-                  <span className="flex-1 text-left">Unfiled</span>
-                  <span className="text-xs text-zinc-600">{unfiledNotes.length}</span>
-                </button>
-                {activeFolderId === '__unfiled__' && unfiledNotes.map((note) => (
-                  <NoteRow
-                    key={note.id}
-                    note={note}
-                    depth={1}
-                    isActive={activeNoteId === note.id}
-                    onClick={() => handleNoteClick(note.id)}
-                  />
-                ))}
-              </div>
-            )}
-
-            {folderTree.length === 0 && unfiledNotes.length === 0 && (
-              <p className="text-zinc-700 text-xs text-center mt-8 px-4">
-                No notes yet. Create one!
-              </p>
-            )}
-          </div>
-        )}
+          {folderTree.length === 0 && unfiledNotes.length === 0 && (
+            <p className="text-zinc-700 text-xs text-center mt-8 px-4">
+              No notes yet. Create one!
+            </p>
+          )}
+        </div>
       </div>
     </aside>
   )

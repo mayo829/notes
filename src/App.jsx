@@ -3,12 +3,14 @@ import Sidebar from './components/Sidebar'
 import NoteEditor from './components/NoteEditor'
 import NoteViewer from './components/NoteViewer'
 import SaveBar from './components/SaveBar'
+import SearchResults from './components/SearchResults'
 import { useNotesStore } from './store/useNotesStore'
 
 export default function App() {
-  const { getActiveNote, isEditing, createNote } = useNotesStore()
+  const { getActiveNote, isEditing, createNote, searchQuery, activeTag } = useNotesStore()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const note = getActiveNote()
+  const isSearching = !!(searchQuery.trim() || activeTag)
 
   return (
     <div className="flex h-screen overflow-hidden bg-surface-950 text-zinc-200 font-sans">
@@ -51,7 +53,9 @@ export default function App() {
 
         {/* Note area */}
         <div className="flex-1 overflow-hidden">
-          {note ? (
+          {isSearching ? (
+            <SearchResults />
+          ) : note ? (
             isEditing ? (
               <NoteEditor note={note} />
             ) : (
