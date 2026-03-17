@@ -18,6 +18,15 @@
   ],
   "notes": [
     {
+      "id": "c24d6b29-4e71-4e02-8ea9-3702524db57c",
+      "title": "2026 NVIDIA GTC",
+      "folderId": null,
+      "content": "# Untitled Note\n\n## [Pregame](https://www.youtube.com/watch?v=RTmSrIFZanc) \n- mostly applications of AI and notes from major CEO's that are using this infrastructure\n\n  - [Perplexity Computer](https://www.perplexity.ai/hub/blog/introducing-perplexity-computer)\n\n- somehow using all of the data in enterpise companies that is not structured and somehow utilizing it since it can be used for training, and other things\n\n- good speakers talk very high level, keeping things at the highest abstraction level and not going too granular\n\n- almost everything in the 5 layer cake is being transforemed by AI\n\n- [5 layer cake of ai by Jenseng huang](https://blogs.nvidia.com/blog/ai-5-layer-cake/)\n\n  - ![Screenshot 2026-03-16 at 12 10 26 PM](/notes/images/Screenshot_2026-03-16_at_12_10_26_PM.png)\n\n- co-design: basically desining with all teams tightly coupled together and working together at the same time instead of teams working semi-independently then sharing what is completed.\n\n\n- Questions:\n  - How does edge ai work and how is it possible\n  - lpddr5\n  - [vera rubin platform semianalysis](https://newsletter.semianalysis.com/p/vera-rubin-extreme-co-design-an-evolution)\n  - 6th gen nvlink!\n  - nvlink switches\n  - [groq 3](https://developer.nvidia.com/blog/inside-nvidia-groq-3-lpx-the-low-latency-inference-accelerator-for-the-nvidia-vera-rubin-platform/)\n    - LPUs in general, which are optimized for sequential portion of inference whereas the gpus are for the parallel work\n  - [kv caching](https://huggingface.co/blog/not-lain/kv-caching)\n  - groq 3 vs vera rubin cpus. rubin is for high throughput, groq is for low latency.\nQUESTION: [Why is each architecture better in each parameter]\nANSWER: [answer it]\nQUESTION: [Why is latency and throughput enemies and going against each other. Why cant make one that is optimized for both?]\nANSWER: [answer it]\n  - ![Screenshot 2026-03-16 at 8 15 17 PM](/notes/images/Screenshot_2026-03-16_at_8_15_17_PM.png)\n\n- Understand agentic ai workflows, what operations are most common, and why these supercomputers are architected the way that they are to accelerate these workflows.\n- disaggregated inference",
+      "tags": [],
+      "createdAt": "2026-03-16T16:00:27.439Z",
+      "updatedAt": "2026-03-17T00:29:59.520Z"
+    },
+    {
       "id": "28fdfca2-9fc7-496b-805a-1258eecb3461",
       "title": "2026 Social Media Content Creation",
       "folderId": "598761ca-793b-43f0-a19e-a36c2370ab61",
