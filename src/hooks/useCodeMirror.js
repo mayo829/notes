@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { EditorState } from '@codemirror/state'
-import { EditorView, keymap, lineNumbers, drawSelection, dropCursor, rectangularSelection, crosshairCursor, highlightActiveLine, highlightActiveLineGutter } from '@codemirror/view'
+import { EditorState, RangeSetBuilder } from '@codemirror/state'
+import { EditorView, ViewPlugin, Decoration, keymap, lineNumbers, drawSelection, dropCursor, rectangularSelection, crosshairCursor, highlightActiveLine, highlightActiveLineGutter } from '@codemirror/view'
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { indentOnInput, bracketMatching, foldGutter, syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language'
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
@@ -286,6 +286,43 @@ function listShiftTabCommand({ state, dispatch }) {
   return false
 }
 
+// ── Text-block ('''...''') delimiter highlighter ─────────────────────────────
+// Dims the ''' delimiter lines and tints the content lines between them so the
+// block is visually distinct in the editor without being obtrusive.
+function makeTextBlockPlugin() {
+  const delimDeco = Decoration.line({ class: 'cm-textblock-delim' })
+  const bodyDeco  = Decoration.line({ class: 'cm-textblock-body'  })
+
+  return ViewPlugin.fromClass(class {
+    constructor(view) { this.decorations = this._build(view) }
+    update(u) {
+      if (u.docChanged || u.viewportChanged) this.decorations = this._build(u.view)
+    }
+    _build(view) {
+      const builder = new RangeSetBuilder()
+      const doc = view.state.doc
+      // Track open/close across the full document so blocks that start before
+      // the viewport are still recognised inside it.
+      let inside = false
+      for (let n = 1; n <= doc.lines; n++) {
+        const line = doc.line(n)
+        if (line.text.trim() === "'''") {
+          // Only add decoration when the line is in the visible viewport
+          if (line.from >= view.viewport.from - 1 && line.from <= view.viewport.to) {
+            builder.add(line.from, line.from, delimDeco)
+          }
+          inside = !inside
+        } else if (inside) {
+          if (line.from >= view.viewport.from - 1 && line.from <= view.viewport.to) {
+            builder.add(line.from, line.from, bodyDeco)
+          }
+        }
+      }
+      return builder.finish()
+    }
+  }, { decorations: v => v.decorations })
+}
+
 // Dark theme matching the app palette
 const appTheme = EditorView.theme({
   '&': {
@@ -343,6 +380,9 @@ const appTheme = EditorView.theme({
   '.cm-selectionMatch': { backgroundColor: '#a78bfa20' },
   // Bracket matching
   '.cm-matchingBracket': { backgroundColor: '#a78bfa30', outline: '1px solid #a78bfa80' },
+  // Text-block delimiters (''') and their body lines
+  '.cm-textblock-delim': { color: '#52525b !important', fontStyle: 'italic' },
+  '.cm-textblock-body': { backgroundColor: '#ffffff04', borderLeft: '2px solid #3f3f4660', paddingLeft: '6px' },
 }, { dark: true })
 
 export function useCodeMirror({ containerRef, value, onChange }) {
@@ -402,6 +442,8 @@ export function useCodeMirror({ containerRef, value, onChange }) {
         ]),
         // HTML → Markdown paste
         makePasteExtension(),
+        // Text-block (''') delimiter highlighting
+        makeTextBlockPlugin(),
         // Theme
         appTheme,
         // Change listener

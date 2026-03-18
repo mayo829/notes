@@ -80,13 +80,6 @@
     @apply line-through text-zinc-600;
   }
 
-  /* Inline code */
-  .note-prose :not(pre) > code {
-    @apply font-mono text-[13px] text-violet-300
-           bg-violet-950/40 border border-violet-800/30
-           px-1.5 py-0.5 rounded;
-  }
-
   /* Horizontal rule */
   .note-prose hr {
     @apply my-8 border-0 h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent;
@@ -121,10 +114,18 @@
            text-violet-400 leading-7 min-w-[20px];
   }
 
-  /* Nested lists — indent and change bullet style */
+  /* Nested lists — indent, change bullet style, and add thread guide line */
   .note-prose li > ul,
   .note-prose li > ol {
     @apply mt-1.5 mb-0 pl-4;
+    border-left: 1.5px solid rgba(63, 63, 70, 0.45); /* zinc-700/45 */
+    margin-left: 0.3rem;
+    transition: border-color 150ms ease;
+  }
+  /* Highlight the guide line when the cursor is anywhere inside that thread */
+  .note-prose li:hover > ul,
+  .note-prose li:hover > ol {
+    border-left-color: rgba(139, 92, 246, 0.35); /* violet-500/35 */
   }
   .note-prose li > ul > li::before {
     @apply w-1 h-1 bg-zinc-500 top-[13px];

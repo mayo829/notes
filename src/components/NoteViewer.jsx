@@ -120,27 +120,40 @@ function processWikiLinks(children, setActiveNote, getNoteByTitle) {
   })
 }
 
-// ── Q&A parser ────────────────────────────────────────────────────────────────
-// Splits raw markdown into { type:'md', content } and { type:'qa', question, answer }.
+// ── Q&A + text-block parser ───────────────────────────────────────────────────
+// Splits raw markdown into:
+//   { type:'md', content }
+//   { type:'qa', question, answer }
+//   { type:'textblock', content }
 //
-// Syntax (single-line or multi-line, both work):
-//   QUESTION[What is X?] ANSWER[X is Y.]
-//   QUESTION[
-//     What is X?
-//   ]
-//   ANSWER[
-//     X is Y.
-//   ]
+// Q&A syntax (single-line or multi-line, both work):
+//   QUESTION'''[What is X?]''' ANSWER'''[X is Y.]'''
+//
+// Text-block syntax — wrap any content in triple single-quotes to render the
+// whole thing as one indented block (lists inside stay properly nested):
+//   '''
+//   Any **markdown** here
+//   - including lists
+//   '''
+//   or inline: '''some text'''
+//
+// The QA alternative is listed first so its ''' delimiters are consumed before
+// the standalone text-block branch can match them.
 function parseSegments(raw) {
   const segments = []
-  // Flexible: allows QUESTION[ or QUESTION: [ or - QUESTION: [ etc.
-  const re = /QUESTION[:\s]*\[([\s\S]*?)\][\s\S]*?ANSWER[:\s]*\[([\s\S]*?)\]/g
+  const re = /QUESTION'''\[([\s\S]*?)\]'''[\s\S]*?ANSWER'''\[([\s\S]*?)\]'''|'''([\s\S]*?)'''/g
   let last = 0
   let match
   while ((match = re.exec(raw)) !== null) {
     const before = raw.slice(last, match.index)
     if (before.trim()) segments.push({ type: 'md', content: before })
-    segments.push({ type: 'qa', question: match[1].trim(), answer: match[2].trim() })
+    if (match[1] !== undefined) {
+      // QA block — groups 1 & 2
+      segments.push({ type: 'qa', question: match[1].trim(), answer: match[2].trim() })
+    } else {
+      // Text block — group 3
+      segments.push({ type: 'textblock', content: match[3].trim() })
+    }
     last = match.index + match[0].length
   }
   const after = raw.slice(last)
@@ -224,6 +237,19 @@ function FlashCard({ question, answer, components }) {
   )
 }
 
+// ── TextBlock ─────────────────────────────────────────────────────────────────
+// Renders '''...''' content as a single indented block. All markdown inside
+// (including nested lists) is contained within one visually-unified element.
+function TextBlock({ content, components }) {
+  return (
+    <div className="my-3 pl-4 ml-1 border-l-2 border-zinc-600/60 py-0.5">
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+        {content}
+      </ReactMarkdown>
+    </div>
+  )
+}
+
 export default function NoteViewer({ note }) {
   const { setIsEditing, setActiveNote, getNoteByTitle, getBacklinks, folders } = useNotesStore()
   const folder = folders?.find((f) => f.id === note.folderId)
@@ -255,7 +281,7 @@ export default function NoteViewer({ note }) {
       )
     },
     code({ inline, className, children }) {
-      if (inline) return <code>{children}</code>
+      if (inline) return <>{children}</>
       return <CodeBlock language={className}>{children}</CodeBlock>
     },
     // Prevent double-wrapping — CodeBlock renders its own container
@@ -302,6 +328,8 @@ export default function NoteViewer({ note }) {
           {parseSegments(note.content).map((seg, i) =>
             seg.type === 'qa' ? (
               <FlashCard key={i} question={seg.question} answer={seg.answer} components={components} />
+            ) : seg.type === 'textblock' ? (
+              <TextBlock key={i} content={seg.content} components={components} />
             ) : (
               <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} components={components}>
                 {seg.content}
